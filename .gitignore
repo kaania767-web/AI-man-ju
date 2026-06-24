@@ -1,0 +1,7 @@
+﻿# AI Man Ju - Git ignore rules
+site.zip
+*.pyc
+__pycache__/
+_archive/
+*.log
+output/*.mp4

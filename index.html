@@ -1,0 +1,880 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浪漫主义流浪家漫剧</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #E8A040;
+    --warm-orange: #D4763A;
+    --twilight: #6B4C6E;
+    --deep-blue: #1C3A5C;
+    --sea-blue: #3A6B8F;
+    --cream: #F5E6CA;
+    --warm-bg: #1a1a2e;
+    --text-light: #f0ede6;
+    --text-muted: #b8b0a4;
+    --card-bg: rgba(26, 26, 46, 0.7);
+    --border-subtle: rgba(232, 160, 64, 0.2);
+    --font-serif: "Noto Serif SC", "Source Han Serif SC", "思源宋体", serif;
+    --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #0d0d1a;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--warm-bg);
+    color: var(--text-light);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== Scrollbar ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0d0d1a; }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+  /* ===== Cover ===== */
+  .cover {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #0d0d1a;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center bottom, rgba(232,160,64,0.15) 0%, transparent 70%);
+    z-index: 1;
+  }
+
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    background: url('output/01-1_落日海面全景.png') center 30% / cover no-repeat;
+    filter: saturate(0.8) brightness(0.5);
+    transform: scale(1.05);
+    transition: transform 8s ease;
+    animation: coverZoom 20s infinite alternate ease-in-out;
+  }
+
+  @keyframes coverZoom {
+    0% { transform: scale(1.05); }
+    100% { transform: scale(1.15); }
+  }
+
+  .cover-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    max-width: 800px;
+  }
+
+  .cover-content .label {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .cover-content h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.5);
+    letter-spacing: 0.05em;
+  }
+
+  .cover-content .subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .cover-content .scroll-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    letter-spacing: 0.15em;
+    animation: hintPulse 2s infinite;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.6; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(4px); }
+  }
+
+  /* ===== Scene Section ===== */
+  .scene {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+
+  .scene-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+    position: relative;
+  }
+
+  .scene-header::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 1.5rem;
+  }
+
+  .scene-number {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .scene-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    color: var(--text-light);
+    font-weight: 600;
+  }
+
+  .scene-title-jp {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-top: 0.25rem;
+  }
+
+  /* ===== Shot ===== */
+  .shot {
+    margin-bottom: 3rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .shot.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .shot-image-wrap {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0d0d1a;
+    box-shadow: 0 4px 60px rgba(0,0,0,0.4);
+  }
+
+  .shot-image-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .shot-image-wrap:hover img {
+    transform: scale(1.02);
+  }
+
+  /* ===== Dialogue overlay ===== */
+  .dialogue {
+    margin-top: 1rem;
+    padding: 1.2rem 1.5rem;
+    background: var(--card-bg);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+
+  .dialogue .speaker {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
+  }
+
+  .dialogue .line {
+    font-family: var(--font-serif);
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+    color: var(--text-light);
+    line-height: 1.8;
+  }
+
+  .dialogue .line + .line {
+    margin-top: 0.5rem;
+  }
+
+  /* ===== Narration ===== */
+  .narration {
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: clamp(0.9rem, 1.6vw, 1rem);
+    color: var(--text-muted);
+    font-style: italic;
+    letter-spacing: 0.03em;
+  }
+
+  /* ===== Shot caption ===== */
+  .shot-caption {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== Inline dialogue on image ===== */
+  .shot-image-wrap .overlay-text {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .overlay-text.bottom-left {
+    bottom: 1.5rem;
+    left: 1.5rem;
+    max-width: 70%;
+  }
+
+  .overlay-text.bottom-right {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    max-width: 60%;
+    text-align: right;
+  }
+
+  .overlay-text.top-left {
+    top: 1.5rem;
+    left: 1.5rem;
+    max-width: 60%;
+  }
+
+  .overlay-text .bubble {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background: rgba(13, 13, 26, 0.75);
+    backdrop-filter: blur(8px);
+    border-radius: 4px;
+    font-family: var(--font-serif);
+    font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+    color: var(--text-light);
+    line-height: 1.6;
+    border-left: 2px solid var(--gold);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+
+  .overlay-text .bubble .speaker-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.15rem;
+    opacity: 0.8;
+  }
+
+  /* ===== Two-shot grid ===== */
+  .shot-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .shot-grid-2 .shot {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 640px) {
+    .shot-grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 4rem 1.5rem 3rem;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.6;
+  }
+
+  .footer::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 2rem;
+  }
+
+  .footer p {
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  .footer .credit {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  /* ===== Final spread ===== */
+  .final-spread {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .final-spread {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 480px) {
+    .scene { padding: 2.5rem 1rem; }
+    .dialogue { padding: 0.8rem 1rem; }
+    .overlay-text.bottom-left { left: 0.8rem; bottom: 0.8rem; max-width: 85%; }
+    .overlay-text.bottom-right { right: 0.8rem; bottom: 0.8rem; max-width: 80%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== VIDEO PLAYER ========== -->
+<section class="scene" style="padding-top: 2rem;">
+  <div class="scene-header">
+    <div class="scene-number">漫剧视频</div>
+    <div class="scene-title">浪漫主义流浪家 · 全片</div>
+  </div>
+  <div class="shot visible" style="opacity:1;transform:none;margin-bottom:0;">
+    <div class="video-wrap">
+      <video controls poster="output/01-1_落日海面全景.png" style="width:100%;border-radius:4px;box-shadow:0 4px 60px rgba(0,0,0,0.4);">
+        <source src="output/浪漫主义流浪家_漫剧_web.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="shot-caption" style="margin-top:0.8rem;">AI 漫剧 · 第3分12秒· 1920×1080</div>
+  </div>
+</section>
+
+<!-- ========== COVER ========== -->
+<section class="cover">
+  <div class="cover-bg"></div>
+  <div class="cover-content">
+    <div class="label">✦ AI 漫剧</div>
+    <h1>浪漫主义流浪家</h1>
+    <p class="subtitle">一个关于相遇与告别的故事/p>
+    <p class="scroll-hint">向下翻阅</p>
+  </div>
+</section>
+
+<!-- ========== PROLOGUE ========== -->
+<section class="scene">
+  <div class="shot visible" style="opacity:1;transform:none;">
+    <div class="narration">
+      那是我在平潭的最后一个傍晚。<br>
+      海风咸涩，落日熔金。我以为这不过是又一个安静的黄昏。
+    </div>
+  </div>
+</section>
+
+<!-- ========== SCENE 1 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 01</div>
+    <div class="scene-title">平潭海边 · 重逢/div>
+    <div class="scene-title-jp">へんたん かいへん · さいかい</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/01-1_落日海面全景.png" alt="落日海面全景" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">VO · 我/span>
+          认识郑新那年，也是这样的夏天。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 1-1 · 全景·慢推</div>
+  </div>
+
+  <div class="shot" data-delay="100">
+    <div class="shot-image-wrap">
+      <img src="output/01-2_郑新出现.png" alt="郑新出现" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          嘿，好久不见。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 1-2 · 中景</div>
+  </div>
+
+  <div class="shot" data-delay="200">
+    <div class="shot-image-wrap">
+      <img src="output/01-3_郑新释然一笑.png" alt="郑新释然一笑" loading="lazy">
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          你知道吗，我在大理住过一个房间，<br>只有空调外机没有空调内机。<br>老板说——「意境到了就行」。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 1-3 · 近景</div>
+  </div>
+
+  <div class="shot" data-delay="300">
+    <div class="shot-image-wrap">
+      <img src="output/01-4_我认出他.png" alt="我认出他" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          你还是老样子。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 1-4 · 中景</div>
+  </div>
+
+  <div class="shot" data-delay="400">
+    <div class="shot-image-wrap">
+      <img src="output/01-5_对话蒙太奇.png" alt="对话蒙太奇" loading="lazy">
+    </div>
+    <div class="dialogue">
+      <div class="line">— 这些年跑哪去了？</div>
+      <div class="line">— 瞎跑呗。新疆、西藏、大理……活着。</div>
+      <div class="line">— 跟高中同学都没联系了？/div>
+      <div class="line">— 嗯。你是我这几年遇到的第一个熟人。</div>
+    </div>
+    <div class="shot-caption">Shot 1-5 · 对话蒙太奇/div>
+  </div>
+</section>
+
+<!-- ========== SCENE 2 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 02</div>
+    <div class="scene-title">石头上 · 落日</div>
+    <div class="scene-title-jp">いしのうえ · らくじつ</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/02-1_岩石剪影.png" alt="岩石剪影" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">VO · 郑新</span>
+          我爸走的那天，我在新疆，信号都没有。<br>等我知道，已经是一周后了。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 2-1 · 远景</div>
+  </div>
+
+  <div class="shot" data-delay="100">
+    <div class="shot-image-wrap">
+      <img src="output/02-2_郑新侧脸.png" alt="郑新侧脸" loading="lazy">
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          算一算，十来年没回过家了。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 2-2 · 近景</div>
+  </div>
+
+  <div class="shot" data-delay="200">
+    <div class="shot-image-wrap">
+      <img src="output/02-3_闪回母亲车祸.png" alt="闪回母亲车祸" loading="lazy">
+    </div>
+    <div class="narration">高中那年，他母亲在接他放学的路上出了车祸。<br>从那以后，郑新变了。</div>
+    <div class="shot-caption">Shot 2-3 · 闪回</div>
+  </div>
+
+  <div class="shot" data-delay="300">
+    <div class="shot-image-wrap">
+      <img src="output/02-4_高中郑新黯然.png" alt="高中郑新黯然" loading="lazy">
+    </div>
+    <div class="shot-caption">Shot 2-4 · 回忆 · 高中郑新</div>
+  </div>
+</section>
+
+<!-- ========== SCENE 3 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 03</div>
+    <div class="scene-title">回忆 · 高三 · 便利贴/div>
+    <div class="scene-title-jp">かいそう · こうさん · べんりて</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/03-1_教室全景.png" alt="教室全景" loading="lazy">
+    </div>
+    <div class="narration">高三那年，老师让大家在便利贴上写自己的理想。</div>
+    <div class="shot-caption">Shot 3-1 · 教室全景</div>
+  </div>
+
+  <div class="shot" data-delay="100">
+    <div class="shot-image-wrap">
+      <img src="output/03-2_便利贴特写.png" alt="便利贴特写" loading="lazy">
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          流浪
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 3-2 · 便利贴特写/div>
+  </div>
+
+  <div class="shot" data-delay="200">
+    <div class="shot-image-wrap">
+      <img src="output/03-3_回到现在.png" alt="回到现在" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          你还记不记得你写的什么？
+        </div>
+      </div>
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          记得。<br>我说我要去流浪。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 3-3 · 回到现在</div>
+  </div>
+</section>
+
+<!-- ========== SCENE 4 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 04</div>
+    <div class="scene-title">男儿志在四方</div>
+    <div class="scene-title-jp">だんじ こころざし しほう/div>
+  </div>
+
+  <div class="shot-grid-2">
+    <div class="shot" data-delay="0">
+      <div class="shot-image-wrap">
+        <img src="output/04-1_男儿志在四方.png" alt="男儿志在四方" loading="lazy">
+        <div class="overlay-text bottom-left">
+          <div class="bubble">
+            <span class="speaker-label">郑新</span>
+            我可是要征服世界的男人！
+          </div>
+        </div>
+      </div>
+      <div class="shot-caption">Shot 4-1 · 低角度仰拍/div>
+    </div>
+
+    <div class="shot" data-delay="100">
+      <div class="shot-image-wrap">
+        <img src="output/04-2_我的怅然.png" alt="我的怅然" loading="lazy">
+      </div>
+      <div class="dialogue">
+        <div class="speaker">我/div>
+        <div class="line">（看着他，忽然有点羡慕）/div>
+      </div>
+      <div class="shot-caption">Shot 4-2 · 近景</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SCENE 5 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 05</div>
+    <div class="scene-title">夜幕降临 · 告别</div>
+    <div class="scene-title-jp">よる くだり · こくべつ</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/05-1_夜幕降临.png" alt="夜幕降临" loading="lazy">
+    </div>
+    <div class="shot-caption">Shot 5-1 · 延时 · 天色渐暗</div>
+  </div>
+
+  <div class="shot" data-delay="100">
+    <div class="shot-image-wrap">
+      <img src="output/05-2_交换联系方式.png" alt="交换联系方式" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          加个微信？
+        </div>
+      </div>
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          好。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 5-2 · 交换联系方式</div>
+  </div>
+</section>
+
+<!-- ========== SCENE 6 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 06</div>
+    <div class="scene-title">深夜 · 燥热</div>
+    <div class="scene-title-jp">しんや · そうねつ</div>
+  </div>
+
+  <div class="shot-grid-2">
+    <div class="shot" data-delay="0">
+      <div class="shot-image-wrap">
+        <img src="output/06-1_辗转难眠.png" alt="辗转难眠" loading="lazy">
+      </div>
+      <div class="shot-caption">Shot 6-1 · 辗转难眠</div>
+    </div>
+
+    <div class="shot" data-delay="100">
+      <div class="shot-image-wrap">
+        <img src="output/06-2_手机特写.png" alt="手机特写" loading="lazy">
+        <div class="overlay-text bottom-left">
+          <div class="bubble">
+            <span class="speaker-label">郑新</span>
+            睡了吗？<br>出来喝杯咖啡。
+          </div>
+        </div>
+      </div>
+      <div class="shot-caption">Shot 6-2 · 手机特写</div>
+    </div>
+  </div>
+
+  <div class="narration">于是凌晨一点，我在民宿门口见到了拎着两杯咖啡的他。</div>
+</section>
+
+<!-- ========== SCENE 7 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 07</div>
+    <div class="scene-title">公园 · 深夜咖啡</div>
+    <div class="scene-title-jp">こうえん · しんや コーヒー</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/07-1_深夜公园.png" alt="深夜公园" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          蝉声如潮，路灯昏黄。<br>这座岛上醒着的，大概只剩我们了。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 7-1 · 深夜公园</div>
+  </div>
+
+  <div class="shot" data-delay="100">
+    <div class="shot-image-wrap">
+      <img src="output/07-2_聊天蒙太奇.png" alt="聊天蒙太奇" loading="lazy">
+    </div>
+    <div class="dialogue">
+      <div class="line">— 你去过那么多地方，最喜欢哪里？/div>
+      <div class="line">— 大理吧。在那里我住了最久。白天在古城闲逛，晚上去山上躺着看星星。</div>
+      <div class="line">— 不孤独吗？/div>
+      <div class="line">— 孤独啊。但孤独和自由是一回事的两面。</div>
+    </div>
+    <div class="shot-caption">Shot 7-2 · 聊天蒙太奇/div>
+  </div>
+
+  <div class="shot" data-delay="200">
+    <div class="shot-image-wrap">
+      <img src="output/07-3_咖啡杯特写.png" alt="咖啡杯特写" loading="lazy">
+    </div>
+    <div class="narration">咖啡已经凉了，但谁也没说要走。</div>
+    <div class="shot-caption">Shot 7-3 · 咖啡杯特写/div>
+  </div>
+</section>
+
+<!-- ========== SCENE 8 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 08</div>
+    <div class="scene-title">浪漫主义流浪家</div>
+    <div class="scene-title-jp">ロマンしゅぎ るろうか</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/08-1_浪漫主义流浪家.png" alt="浪漫主义流浪家" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          你知道吗，我觉得你不是在流浪。
+        </div>
+      </div>
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          你是一个浪漫主义流浪家。<br>——你流浪，是因为你把世界过成了诗。
+        </div>
+      </div>
+    </div>
+    <div class="dialogue">
+      <div class="line">郑新愣了两秒，然后笑了起来，笑得眼睛都眯成了一条缝。</div>
+      <div class="line" style="color:var(--gold);">浪漫主义流浪家……这个好。我要记下来。</div>
+    </div>
+    <div class="shot-caption">Shot 8-1</div>
+  </div>
+</section>
+
+<!-- ========== SCENE 9 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 09</div>
+    <div class="scene-title">大理之约</div>
+    <div class="scene-title-jp">だいり の やくそく</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/09-1_大理之约.png" alt="大理之约" loading="lazy">
+      <div class="overlay-text bottom-left">
+        <div class="bubble">
+          <span class="speaker-label">郑新</span>
+          等我安顿下来，你来大理找我。<br>三年后吧——不见不散。
+        </div>
+      </div>
+      <div class="overlay-text bottom-right">
+        <div class="bubble">
+          <span class="speaker-label">我</span>
+          不见不散。
+        </div>
+      </div>
+    </div>
+    <div class="shot-caption">Shot 9-1 · 大理之约</div>
+  </div>
+</section>
+
+<!-- ========== SCENE 10 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 10</div>
+    <div class="scene-title">次日清晨</div>
+    <div class="scene-title-jp">じつじつ せいしん</div>
+  </div>
+
+  <div class="shot-grid-2">
+    <div class="shot" data-delay="0">
+      <div class="shot-image-wrap">
+        <img src="output/10-1_阳台日出.png" alt="阳台日出" loading="lazy">
+      </div>
+      <div class="shot-caption">Shot 10-1 · 阳台日出</div>
+    </div>
+
+    <div class="shot" data-delay="100">
+      <div class="shot-image-wrap">
+        <img src="output/10-2_手机消息.png" alt="手机消息" loading="lazy">
+        <div class="overlay-text bottom-left">
+          <div class="bubble">
+            <span class="speaker-label">郑新</span>
+            我到家了，你也早点休息。<br><br>
+            有时候往天上一看， 17岁的没区别。<br>
+            于是我一直看着天，不看这个世界。
+          </div>
+        </div>
+      </div>
+      <div class="shot-caption">Shot 10-2 · 手机消息</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SCENE 11 ========== -->
+<section class="scene">
+  <div class="scene-header">
+    <div class="scene-number">SCENE 11</div>
+    <div class="scene-title">尾声 · 天空</div>
+    <div class="scene-title-jp">びせい · てんくう</div>
+  </div>
+
+  <div class="shot" data-delay="0">
+    <div class="shot-image-wrap">
+      <img src="output/11-1_天空意境.png" alt="天空意境" loading="lazy">
+    </div>
+    <div class="narration">
+      我放下手机，看向窗外。<br>
+      天亮了。云在走。<br>
+      和十七岁那年看到的，确实没什么区别。
+    </div>
+    <div class="shot-caption">Shot 11-1 · 天空 · 淡出</div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<section class="footer">
+  <p>
+    《浪漫主义流浪家》<br>
+    原作 / 脚本 · 唐文浚<br>
+    AI 绘图 · ComfyUI + DreamShaperXL
+  </p>
+  <p class="credit">
+    谨以此片献给每一个在路上的浪漫主义流浪家<br>
+    愿你看得到天空，也记得回家的路。
+  </p>
+</section>
+
+<script>
+// 滚动触发渐入动画
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const delay = parseInt(entry.target.dataset.delay) || 0;
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, delay);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.shot').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
