@@ -5,5 +5,4 @@ __pycache__/
 _archive/
 *.log
 output/*.mp4
-
 .pnpm-store/
